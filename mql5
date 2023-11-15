@@ -1,0 +1,89 @@
+
+//+------------------------------------------------------------------+
+//|                                        Fringe AI MT4                                     |
+//|                                 Developer: Forex Robot Easy Team                          |
+//|                                 Website: forexroboteasy.com                               |
+//+------------------------------------------------------------------+
+
+//--- Expert Advisor initializations and external parameters
+extern string EATitle = 'Fringe AI MT4';
+extern double LotSize = 0.01;
+extern double StopLossPercent = 1.0;
+extern double TakeProfitPercent = 2.0;
+
+//--- Global variables
+int ticket = 0;
+
+//+------------------------------------------------------------------+
+//| Custom indicator function                                          |
+//+------------------------------------------------------------------+
+int CustomIndicator()
+{
+    // Perform supply and demand analysis here
+    // Return the entry zone based on the analysis
+    return 0;
+}
+
+//+------------------------------------------------------------------+
+//| Expert Advisor start function                                      |
+//+------------------------------------------------------------------+
+int start()
+{
+    // Check if there are open trades
+    if (OrdersTotal() != 0)
+        return 0;
+    
+    // Check if the current symbol is supported
+    string symbol = Symbol();
+    if (symbol != 'GBPAUD' && symbol != 'USDJPY' && symbol != 'AUDUSD' && symbol != 'GBPJPY' && symbol != 'EURAUD')
+        return 0;
+    
+    // Check if the current timeframe is supported
+    int timeframe = Period();
+    if (timeframe != PERIOD_H1)
+        return 0;
+    
+    // Calculate stop loss and take profit levels
+    double stopLoss = NormalizeDouble(Ask - (Ask * StopLossPercent / 100), Digits);
+    double takeProfit = NormalizeDouble(Ask + (Ask * TakeProfitPercent / 100), Digits);
+    
+    // Perform supply and demand analysis
+    int entryZone = CustomIndicator();
+    
+    // Check if the entry zone is valid
+    if (entryZone != 0)
+    {
+        // Open a trade based on the analysis
+        ticket = OrderSend(symbol, OP_BUY, LotSize, Ask, 10, stopLoss, takeProfit, EATitle, MagicNumber, 0, clrGreen);
+        if (ticket > 0)
+        {
+            // Trade opened successfully
+            Print('Trade opened with ticket: ', ticket);
+        }
+        else
+        {
+            // Failed to open trade
+            Print('Failed to open trade. Error code: ', GetLastError());
+        }
+    }
+    
+    return 0;
+}
+
+//+------------------------------------------------------------------+
+//| Expert Advisor initialization function                            |
+//+------------------------------------------------------------------+
+int init()
+{
+    // Initialize necessary features and functions
+    return 0;
+}
+
+//+------------------------------------------------------------------+
+//| Expert Advisor deinitialization function                          |
+//+------------------------------------------------------------------+
+int deinit()
+{
+    // Perform any necessary cleanup actions
+    return 0;
+}
